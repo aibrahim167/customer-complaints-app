@@ -124,18 +124,36 @@
     let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
     let complaintCounter = complaints.length ? complaints[complaints.length-1].id+1 : 1;
 
-    document.getElementById("complaintForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const complaint = {
-        id: complaintCounter++,
-        name: document.getElementById("customerName").value,
-        phone: document.getElementById("phoneNumber").value,
-        method: document.getElementById("contactMethod").value,
-        branch: document.getElementById("branch").value,
-        type: document.getElementById("complaintType").value,
-        details: document.getElementById("complaintDetails").value,
-        status: document.getElementById("status").value
-      };
+ document.getElementById("complaintForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("customerName").value;
+  const phone = document.getElementById("phoneNumber").value;
+  const branch = document.getElementById("branch").value;
+  const method = document.getElementById("contactMethod").value;
+  const type = document.getElementById("complaintType").value;
+  const details = document.getElementById("complaintDetails").value;
+  const status = document.getElementById("status").value;
+
+  // 👇 إضافة التاريخ والوقت الحالي
+  const now = new Date();
+  const dateString = now.toLocaleString("ar-EG", { hour12: false });
+
+  const table = document.getElementById("complaintsTable").getElementsByTagName("tbody")[0];
+  const newRow = table.insertRow();
+
+  newRow.innerHTML = `
+    <td>${complaintCounter++}</td>
+    <td>${name}</td>
+    <td>${phone}</td>
+    <td>${branch}</td>
+    <td>${method}</td>
+    <td>${type}</td>
+    <td>${details}</td>
+    <td class="${status === 'تم الحل' ? 'status-closed' : 'status-open'}">${status}</td>
+    <td>${dateString}</td> <!-- التاريخ -->
+  `;
+  this.reset();
       complaints.push(complaint);
       localStorage.setItem("complaints", JSON.stringify(complaints));
       alert("✅ تم تسجيل الشكوى بنجاح!");
