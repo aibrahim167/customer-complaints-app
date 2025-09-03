@@ -62,13 +62,8 @@
     alert("⚠️ يجب تسجيل الدخول أولاً");
     window.location.href="login.html";
   }
-</script>
-<script>
-  if(currentUser.role==="entry"){
-    document.querySelector(".nav").innerHTML =
-      '<a href="login.html">🔒 تسجيل خروج</a>';
-  }
-</script>
+  </script>
+
   <div class="container">
     <h1>📝 تسجيل شكوى عميل</h1>
     <form id="complaintForm">
@@ -124,38 +119,38 @@
     let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
     let complaintCounter = complaints.length ? complaints[complaints.length-1].id+1 : 1;
 
- document.getElementById("complaintForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+    document.getElementById("complaintForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-  const name = document.getElementById("customerName").value;
-  const phone = document.getElementById("phoneNumber").value;
-  const branch = document.getElementById("branch").value;
-  const method = document.getElementById("contactMethod").value;
-  const type = document.getElementById("complaintType").value;
-  const details = document.getElementById("complaintDetails").value;
-  const status = document.getElementById("status").value;
+      const name = document.getElementById("customerName").value;
+      const phone = document.getElementById("phoneNumber").value;
+      const branch = document.getElementById("branch").value;
+      const method = document.getElementById("contactMethod").value;
+      const type = document.getElementById("complaintType").value;
+      const details = document.getElementById("complaintDetails").value;
+      const status = document.getElementById("status").value;
 
-  // 👇 إضافة التاريخ والوقت الحالي
-  const now = new Date();
-  const dateString = now.toLocaleString("ar-EG", { hour12: false });
+      // 👇 إضافة التاريخ والوقت الحالي
+      const now = new Date();
+      const dateString = now.toLocaleString("ar-EG", { hour12: false });
 
-  const table = document.getElementById("complaintsTable").getElementsByTagName("tbody")[0];
-  const newRow = table.insertRow();
+      // 👇 إنشاء الشكوى كـ Object
+      const complaint = {
+        id: complaintCounter++,
+        name,
+        phone,
+        branch,
+        method,
+        type,
+        details,
+        status,
+        date: dateString
+      };
 
-  newRow.innerHTML = `
-    <td>${complaintCounter++}</td>
-    <td>${name}</td>
-    <td>${phone}</td>
-    <td>${branch}</td>
-    <td>${method}</td>
-    <td>${type}</td>
-    <td>${details}</td>
-    <td class="${status === 'تم الحل' ? 'status-closed' : 'status-open'}">${status}</td>
-    <td>${dateString}</td> <!-- التاريخ -->
-  `;
-  this.reset();
+      // 👇 حفظ في LocalStorage
       complaints.push(complaint);
       localStorage.setItem("complaints", JSON.stringify(complaints));
+
       alert("✅ تم تسجيل الشكوى بنجاح!");
       this.reset();
     });
