@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل شكوى</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #56ccf2, #2f80ed, #38ef7d);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 600px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      background: linear-gradient(90deg, #2f80ed, #56ccf2);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { opacity: 0.9; }
+    .nav { text-align: center; margin-top: 15px; }
+    .nav a { text-decoration: none; color: #2f80ed; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  if(!currentUser){ 
+    alert("⚠️ يجب تسجيل الدخول أولاً");
+    window.location.href="login.html";
+  }
+</script>
+<script>
+  if(currentUser.role==="entry"){
+    document.querySelector(".nav").innerHTML =
+      '<a href="login.html">🔒 تسجيل خروج</a>';
+  }
+</script>
+  <div class="container">
+    <h1>📝 تسجيل شكوى عميل</h1>
+    <form id="complaintForm">
+      <label>اسم العميل</label>
+      <input type="text" id="customerName" required>
+
+      <label>رقم الهاتف</label>
+      <input type="tel" id="phoneNumber" required>
+
+      <label>وسيلة التواصل</label>
+      <select id="contactMethod">
+        <option value="هاتف">هاتف</option>
+        <option value="فيس بوك">فيس بوك</option>
+        <option value="اونلاين">اونلاين</option>
+        <option value="تطبيق">تطبيق</option>
+      </select>
+
+      <label>الفرع</label>
+      <select id="branch">
+        <option>الأميرية</option><option>مصر الجديدة</option><option>النادي الأهلي</option>
+        <option>الشروق</option><option>مسطرد</option><option>القصيريين</option>
+        <option>التوفيقية</option><option>الرحاب</option><option>التجمع الأول</option>
+        <option>ميجا مول</option><option>دريمز مول</option><option>مدينتي</option>
+        <option>كرافت زون</option><option>العبور</option><option>مدينة نصر</option>
+        <option>ولي العهد</option>
+      </select>
+
+      <label>نوع الشكوى</label>
+      <select id="complaintType">
+        <option>تأخير</option><option>ناقص</option><option>طلب خطأ</option>
+        <option>جودة</option><option>جسم غريب</option><option>سوء سلوك</option>
+        <option>مندوب</option><option>سوء خدمة</option><option>خطأ في الباقي</option>
+      </select>
+
+      <label>تفاصيل الشكوى</label>
+      <textarea id="complaintDetails" rows="3" required></textarea>
+
+      <label>الحالة</label>
+      <select id="status">
+        <option value="مفتوحة">مفتوحة</option>
+        <option value="تم الحل">تم الحل</option>
+      </select>
+
+      <button type="submit">📌 تسجيل الشكوى</button>
+    </form>
+
+    <div class="nav">
+      <a href="complaints.html">➡ الذهاب إلى سجل الشكاوى</a>
+    </div>
+  </div>
+
+  <script>
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+    let complaintCounter = complaints.length ? complaints[complaints.length-1].id+1 : 1;
+
+    document.getElementById("complaintForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const complaint = {
+        id: complaintCounter++,
+        name: document.getElementById("customerName").value,
+        phone: document.getElementById("phoneNumber").value,
+        method: document.getElementById("contactMethod").value,
+        branch: document.getElementById("branch").value,
+        type: document.getElementById("complaintType").value,
+        details: document.getElementById("complaintDetails").value,
+        status: document.getElementById("status").value
+      };
+      complaints.push(complaint);
+      localStorage.setItem("complaints", JSON.stringify(complaints));
+      alert("✅ تم تسجيل الشكوى بنجاح!");
+      this.reset();
+    });
+  </script>
+</body>
+</html>
