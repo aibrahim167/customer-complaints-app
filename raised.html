@@ -21,6 +21,7 @@
   </style>
 </head>
 <body>
+  <div id="sidebar"></div>
     <script>
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   if(!currentUser){ 
@@ -60,5 +61,12 @@
     }
     renderRaised();
   </script>
+  <script>
+  fetch("sidebar.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("sidebar").innerHTML = data;
+    });
+</script>
 </body>
 </html>

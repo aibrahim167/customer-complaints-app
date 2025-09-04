@@ -3,125 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <title>سجل الشكاوى</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
       background: linear-gradient(135deg, #56ccf2, #2f80ed, #38ef7d);
-      min-height: 100vh; margin: 0; padding: 20px;
-      display: flex; justify-content: center;
+      margin: 0;
+      min-height: 100vh;
     }
+
+    /* المحتوى */
+    .content {
+      margin-right: 60px; /* نفس عرض السايدبار */
+      padding: 20px;
+      transition: margin-right 0.3s ease;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* لما توسع السايدبار */
+    .sidebar:hover ~ .content {
+      margin-right: 220px;
+    }
+
     .container {
-      background: #fff; padding: 20px; border-radius: 20px;
-      width: 100%; max-width: 1200px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 1200px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
-    h1 { text-align: center; margin-bottom: 20px; color: #2c3e50; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-    th { background: linear-gradient(90deg,#56ccf2,#2f80ed,#38ef7d); color: #fff; }
-    tr:hover { background: #f9f9f9; }
-    select.status-select { padding: 5px; border-radius: 6px; }
-    .export { margin: 15px 0; text-align: center; }
-    .export select, .export button { padding: 8px 12px; margin: 5px; border-radius: 8px; }
-    .nav { text-align: center; margin-top: 20px; }
-    .nav a { text-decoration: none; color: #2f80ed; font-weight: bold; margin: 0 10px; }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: linear-gradient(90deg,#56ccf2,#2f80ed,#38ef7d);
+      color: #fff;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    select.status-select {
+      padding: 5px;
+      border-radius: 6px;
+    }
+
+    .export {
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .export select, .export button {
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 8px;
+    }
+
+    .nav {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #2f80ed;
+      font-weight: bold;
+      margin: 0 10px;
+    }
   </style>
 </head>
 <body>
-  <script>
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  if(!currentUser){ 
-    alert("⚠️ يجب تسجيل الدخول أولاً");
-    window.location.href="login.html";
-  }
-</script>
-  <div class="container">
-    <h1>📋 سجل الشكاوى</h1>
+  <!-- السايدبار -->
+  <div id="sidebar"></div>
 
-    <div class="export">
-      <label>الحالة:</label>
-      <select id="statusFilter" onchange="applyFilters()">
-        <option value="all">📑 كل الشكاوى</option>
-        <option value="open">🚨 الشكاوى المفتوحة</option>
-        <option value="closed">✅ الشكاوى التي تم حلها</option>
-      </select>
+  <!-- المحتوى -->
+  <div class="content">
+    <div class="container">
+      <h1>📋 سجل الشكاوى</h1>
 
-      <label>الفرع:</label>
-      <select id="branchFilter" onchange="applyFilters()">
-        <option value="all">🏬 كل الفروع</option>
-        <option>الأميرية</option><option>مصر الجديدة</option><option>النادي الأهلي</option>
-        <option>الشروق</option><option>مسطرد</option><option>القصيريين</option>
-        <option>التوفيقية</option><option>الرحاب</option><option>التجمع الأول</option>
-        <option>ميجا مول</option><option>دريمز مول</option><option>مدينتي</option>
-        <option>كرافت زون</option><option>العبور</option><option>مدينة نصر</option>
-        <option>ولي العهد</option>
-      </select>
+      <div class="export">
+        <label>الحالة:</label>
+        <select id="statusFilter" onchange="applyFilters()">
+          <option value="all">📑 كل الشكاوى</option>
+          <option value="open">🚨 الشكاوى المفتوحة</option>
+          <option value="closed">✅ الشكاوى التي تم حلها</option>
+        </select>
 
-      <button onclick="exportFilteredToExcel()">📤 تصدير إلى Excel</button>
-    </div>
+        <label>الفرع:</label>
+        <select id="branchFilter" onchange="applyFilters()">
+          <option value="all">🏬 كل الفروع</option>
+          <option>الأميرية</option><option>مصر الجديدة</option><option>النادي الأهلي</option>
+          <option>الشروق</option><option>مسطرد</option><option>القصيريين</option>
+          <option>التوفيقية</option><option>الرحاب</option><option>التجمع الأول</option>
+          <option>ميجا مول</option><option>دريمز مول</option><option>مدينتي</option>
+          <option>كرافت زون</option><option>العبور</option><option>مدينة نصر</option>
+          <option>ولي العهد</option>
+        </select>
 
-<table id="complaintsTable">
-  <thead>
-    <tr>
-      <th>رقم الشكوى</th>
-      <th>اسم العميل</th>
-      <th>رقم الهاتف</th>
-      <th>اسم الفرع</th>
-      <th>وسيلة التواصل</th>
-      <th>نوع الشكوى</th>
-      <th>تفاصيل الشكوى</th>
-      <th>الحالة</th>
-      <th>تاريخ التسجيل</th> <!-- عمود جديد -->
-    </tr>
-  </thead>
-  <tbody>
-    <!-- الصفوف الجديدة هتضاف هنا -->
-  </tbody>
-</table>
+        <button onclick="exportFilteredToExcel()">📤 تصدير إلى Excel</button>
+      </div>
 
-    <div class="nav">
-      <a href="form.html">⬅ تسجيل شكوى جديدة</a> |
-      <a href="raised.html">📤 الشكاوى المرفوعة</a>
+      <table id="complaintsTable">
+        <thead>
+          <tr>
+            <th>رقم الشكوى</th>
+            <th>اسم العميل</th>
+            <th>رقم الهاتف</th>
+            <th>اسم الفرع</th>
+            <th>وسيلة التواصل</th>
+            <th>نوع الشكوى</th>
+            <th>تفاصيل الشكوى</th>
+            <th>الحالة</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- الصفوف هتتضاف هنا -->
+        </tbody>
+      </table>
+
+      <div class="nav">
+        <a href="form.html">⬅ تسجيل شكوى جديدة</a> |
+        <a href="raised.html">📤 الشكاوى المرفوعة</a>
+      </div>
     </div>
   </div>
 
+  <!-- استدعاء السايدبار -->
+  <script>
+    fetch("sidebar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("sidebar").innerHTML = data;
+
+        // تمييز الصفحة الحالية
+        const links = document.querySelectorAll(".menu a");
+        const current = window.location.pathname.split("/").pop();
+        links.forEach(link => {
+          if(link.getAttribute("href") === current){
+            link.classList.add("active");
+          }
+        });
+      });
+  </script>
+
+  <!-- حماية تسجيل الدخول -->
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if(!currentUser){
+      alert("⚠️ يجب تسجيل الدخول أولاً");
+      window.location.href="login.html";
+    }
+  </script>
+
+  <!-- منطق الجدول -->
   <script>
     let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
 
-function renderTable() {
-  const tbody=document.querySelector("#complaintsTable tbody");
-  tbody.innerHTML="";
-  complaints.forEach((c,index)=>{
-    const row=document.createElement("tr");
-    row.innerHTML=`
-      <td>${c.id}</td><td>${c.name}</td><td>${c.phone}</td>
-      <td>${c.method}</td><td>${c.branch}</td><td>${c.type}</td>
-      <td>${c.details}</td>
-      <td>
-        <select class="status-select" data-index="${index}">
-          <option value="مفتوحة" ${c.status==="مفتوحة"?"selected":""}>مفتوحة</option>
-          <option value="تم الحل" ${c.status==="تم الحل"?"selected":""}>تم الحل</option>
-        </select>
-      </td>
-      <td>
-        ${currentUser.role==="admin" ? `<button onclick="raiseComplaint(${index})">📤 رفع</button>` : ""}
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
+    function renderTable() {
+      const tbody = document.querySelector("#complaintsTable tbody");
+      tbody.innerHTML = "";
+
+      complaints.forEach((c,index)=>{
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${c.id}</td>
+          <td>${c.name}</td>
+          <td>${c.phone}</td>
+          <td>${c.branch}</td>
+          <td>${c.method}</td>
+          <td>${c.type}</td>
+          <td>${c.details}</td>
+          <td>
+            <select class="status-select" data-index="${index}">
+              <option value="مفتوحة" ${c.status==="مفتوحة"?"selected":""}>مفتوحة</option>
+              <option value="تم الحل" ${c.status==="تم الحل"?"selected":""}>تم الحل</option>
+            </select>
+          </td>
+          <td>
+            ${currentUser.role==="admin" ? `<button onclick="raiseComplaint(${index})">📤 رفع</button>` : ""}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
 
       document.querySelectorAll(".status-select").forEach(sel=>{
         sel.addEventListener("change",function(){
-          const idx=this.getAttribute("data-index");
-          complaints[idx].status=this.value;
+          const idx = this.getAttribute("data-index");
+          complaints[idx].status = this.value;
           localStorage.setItem("complaints",JSON.stringify(complaints));
         });
       });
+
       applyFilters();
     }
 
     function raiseComplaint(index){
-      let raisedComplaints=JSON.parse(localStorage.getItem("raisedComplaints"))||[];
+      let raisedComplaints = JSON.parse(localStorage.getItem("raisedComplaints")) || [];
       raisedComplaints.push(complaints[index]);
       localStorage.setItem("raisedComplaints",JSON.stringify(raisedComplaints));
       complaints.splice(index,1);
@@ -130,40 +230,40 @@ function renderTable() {
     }
 
     function applyFilters(){
-      const statusFilter=document.getElementById("statusFilter").value;
-      const branchFilter=document.getElementById("branchFilter").value;
+      const statusFilter = document.getElementById("statusFilter").value;
+      const branchFilter = document.getElementById("branchFilter").value;
       document.querySelectorAll("#complaintsTable tbody tr").forEach(row=>{
-        const status=row.querySelector("td:nth-child(8) select").value;
-        const branch=row.querySelector("td:nth-child(5)").textContent.trim();
-        let statusMatch=statusFilter==="all"||
+        const status = row.querySelector("td:nth-child(8) select").value;
+        const branch = row.querySelector("td:nth-child(4)").textContent.trim();
+        let statusMatch = statusFilter==="all"||
           (statusFilter==="open"&&status==="مفتوحة")||
           (statusFilter==="closed"&&status==="تم الحل");
-        let branchMatch=branchFilter==="all"||branch===branchFilter;
-        row.style.display=statusMatch&&branchMatch?"":"none";
+        let branchMatch = branchFilter==="all"||branch===branchFilter;
+        row.style.display = statusMatch&&branchMatch ? "" : "none";
       });
     }
 
     function exportFilteredToExcel(){
-      const table=document.getElementById("complaintsTable");
-      const rows=table.querySelectorAll("tbody tr");
-      let exportHTML="<table><tr>";
+      const table = document.getElementById("complaintsTable");
+      const rows = table.querySelectorAll("tbody tr");
+      let exportHTML = "<table><tr>";
       table.querySelectorAll("thead th").forEach(th=>{
         if(th.textContent!=="إجراءات"){exportHTML+=`<th>${th.textContent}</th>`;}
       });
-      exportHTML+="</tr>";
+      exportHTML += "</tr>";
       rows.forEach(row=>{
         if(row.style.display!=="none"){
-          exportHTML+="<tr>";
+          exportHTML += "<tr>";
           row.querySelectorAll("td:not(:last-child)").forEach(td=>{
-            exportHTML+=`<td>${td.textContent}</td>`;
+            exportHTML += `<td>${td.textContent}</td>`;
           });
-          exportHTML+="</tr>";
+          exportHTML += "</tr>";
         }
       });
-      exportHTML+="</table>";
-      const link=document.createElement('a');
-      link.href='data:application/vnd.ms-excel,'+exportHTML.replace(/ /g,'%20');
-      link.download='شكاوى_مفلترة.xls';
+      exportHTML += "</table>";
+      const link = document.createElement('a');
+      link.href = 'data:application/vnd.ms-excel,'+exportHTML.replace(/ /g,'%20');
+      link.download = 'شكاوى_مفلترة.xls';
       document.body.appendChild(link);
       link.click();document.body.removeChild(link);
     }

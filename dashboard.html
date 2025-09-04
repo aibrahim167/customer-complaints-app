@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة متابعة الشكاوي</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0; /* 🔹 شيلنا البادينج */
+      display: flex;
+    }
+
+    /* مكان المحتوى بجانب السايدبار */
+    .content {
+      flex: 1;
+      padding: 20px;  /* 🔹 البادينج هنا بدل body */
+      margin-right: 60px;
+      transition: margin-right 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select, input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    input {
+      width: 250px;
+    }
+
+    /* 🔹 ستايل الـ Kanban */
+    .dashboard {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 15px;
+    }
+    .branch-card {
+      background: #e9f1fb;
+      border-radius: 15px;
+      padding: 15px;
+      min-width: 280px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .branch-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #fff;
+      background: #2f80ed;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .stat {
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+    }
+    .open { background: #e74c3c; }
+    .closed { background: #27ae60; }
+
+    .complaints-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-top: 10px;
+      padding-right: 5px;
+    }
+
+    .complaint {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    }
+    .complaint .status {
+      font-weight: bold;
+      font-size: 13px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+    .complaint.open .status { background: #fdecea; color: #e74c3c; }
+    .complaint.closed .status { background: #eafaf1; color: #27ae60; }
+  </style>
+</head>
+<body>
+  <!-- السايدبار -->
+  <div id="sidebar"></div>
+
+  <!-- المحتوى -->
+  <div class="content">
+    <h1>📊 لوحة متابعة الشكاوي</h1>
+
+    <div class="search-box">
+      <select id="searchType">
+        <option value="name">الاسم</option>
+        <option value="order">رقم الأوردر</option>
+        <option value="phone">رقم العميل</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="🔎 اكتب هنا للبحث...">
+    </div>
+
+    <div class="dashboard" id="dashboard"></div>
+  </div>
+
+  <script>
+    // مثال بيانات من LocalStorage
+    const complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+
+    function renderDashboard(searchType = "", filterText = "") {
+      const dashboard = document.getElementById("dashboard");
+      dashboard.innerHTML = ""; 
+
+      // تجميع الشكاوي حسب الفرع
+      const branches = {};
+      complaints.forEach(c => {
+        if(!branches[c.branch]) branches[c.branch] = [];
+        branches[c.branch].push(c);
+      });
+
+      for(const branch in branches){
+        let branchComplaints = branches[branch];
+
+        // الفلترة حسب البحث
+        if(filterText){
+          branchComplaints = branchComplaints.filter(c => {
+            if(searchType === "name") return c.name.includes(filterText);
+            if(searchType === "order") return (c.id+"").includes(filterText);
+            if(searchType === "phone") return c.phone.includes(filterText);
+            return true;
+          });
+        }
+
+        if(branchComplaints.length === 0) continue;
+
+        const openCount = branchComplaints.filter(c => c.status === "مفتوحة").length;
+        const closedCount = branchComplaints.filter(c => c.status === "تم الحل").length;
+
+        const card = document.createElement("div");
+        card.className = "branch-card";
+
+        card.innerHTML = `
+          <div class="branch-title">${branch}</div>
+          <div class="stats">
+            <div class="stat open">مفتوحة: ${openCount}</div>
+            <div class="stat closed">تم الحل: ${closedCount}</div>
+          </div>
+          <div class="complaints-list">
+            ${branchComplaints.map(c => `
+              <div class="complaint ${c.status === "مفتوحة" ? "open" : "closed"}">
+                <div>🆔 أوردر #${c.id}</div>
+                <div>👤 ${c.name} - 📞 ${c.phone}</div>
+                <div>📝 ${c.details}</div>
+                <div class="status">${c.status}</div>
+                <small>⏰ ${c.date}</small>
+              </div>
+            `).join("")}
+          </div>
+        `;
+
+        dashboard.appendChild(card);
+      }
+    }
+
+    // أول تحميل
+    renderDashboard();
+
+    // البحث
+    const searchInput = document.getElementById("searchInput");
+    const searchType = document.getElementById("searchType");
+
+    searchInput.addEventListener("input", function(){
+      renderDashboard(searchType.value, this.value.trim());
+    });
+
+    searchType.addEventListener("change", function(){
+      renderDashboard(this.value, searchInput.value.trim());
+    });
+  </script>
+  <script>
+    fetch("sidebar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("sidebar").innerHTML = data;
+      });
+  </script>
+</body>
+</html>
