@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إضافة مستخدم جديد</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      display: flex;
+      background: #f5f6fa;
+      min-height: 100vh;
+    }
+
+    #content {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .form-box {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .form-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      background: #2f80ed;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar"></div>
+
+  <!-- المحتوى -->
+  <div id="content">
+    <div class="form-box">
+      <h2>➕ إضافة مستخدم جديد</h2>
+      <form id="createUserForm">
+        <label>الاسم</label>
+        <input type="text" id="name" required>
+
+        <label>الموبايل</label>
+        <input type="text" id="phone" required>
+
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="email" required>
+
+        <label>الوظيفة</label>
+        <select id="role">
+          <option value="Admin">Admin</option>
+          <option value="Dispatcher">Dispatcher</option>
+          <option value="Call Center">Call Center</option>
+        </select>
+
+        <label>الفرع</label>
+        <select id="branch">
+          <option value="مصر الجديدة">مصر الجديدة</option>
+          <option value="مدينة نصر">مدينة نصر</option>
+          <option value="الرحاب">الرحاب</option>
+        </select>
+
+        <button type="submit">💾 حفظ المستخدم</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // تحميل الـ Sidebar
+    fetch("sidebar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("sidebar").innerHTML = data;
+      });
+
+    const form = document.getElementById("createUserForm");
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      let newUser = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        role: document.getElementById("role").value,
+        branch: document.getElementById("branch").value,
+        active: true,
+        lastLogin: "-"
+      };
+
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      // سجل الحركة
+      let logs = JSON.parse(localStorage.getItem("logs")) || [];
+      logs.push({action:`➕ إضافة مستخدم جديد: ${newUser.name}`, time:new Date().toLocaleString("ar-EG")});
+      localStorage.setItem("logs", JSON.stringify(logs));
+
+      alert("✅ تم إضافة المستخدم بنجاح!");
+      window.location.href = "admin.html";
+    });
+  </script>
+</body>
+</html>
