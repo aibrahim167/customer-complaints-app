@@ -3,21 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>لوحة متابعة الشكاوي</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
       background: #f4f6f9;
       margin: 0;
-      padding: 0; /* 🔹 شيلنا البادينج */
+      padding: 0;
       display: flex;
     }
 
-    /* مكان المحتوى بجانب السايدبار */
+    /* السايدبار ثابت */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;  
+      width: 60px;   
+      height: 100vh; 
+      background: #0d47a1; 
+      z-index: 1000;
+    }
+
+    /* المحتوى جنب السايدبار */
     .content {
       flex: 1;
-      padding: 20px;  /* 🔹 البادينج هنا بدل body */
-      margin-right: 60px;
+      padding: 20px;
+      margin-right: 60px; /* نفس عرض السايدبار */
       transition: margin-right 0.3s ease;
+      width: calc(100% - 60px);
     }
 
     h1 {
@@ -45,7 +61,7 @@
       width: 250px;
     }
 
-    /* 🔹 ستايل الـ Kanban */
+    /* Kanban Style */
     .dashboard {
       display: flex;
       gap: 20px;
@@ -136,14 +152,12 @@
   </div>
 
   <script>
-    // مثال بيانات من LocalStorage
     const complaints = JSON.parse(localStorage.getItem("complaints")) || [];
 
     function renderDashboard(searchType = "", filterText = "") {
       const dashboard = document.getElementById("dashboard");
       dashboard.innerHTML = ""; 
 
-      // تجميع الشكاوي حسب الفرع
       const branches = {};
       complaints.forEach(c => {
         if(!branches[c.branch]) branches[c.branch] = [];
@@ -153,7 +167,6 @@
       for(const branch in branches){
         let branchComplaints = branches[branch];
 
-        // الفلترة حسب البحث
         if(filterText){
           branchComplaints = branchComplaints.filter(c => {
             if(searchType === "name") return c.name.includes(filterText);
@@ -194,10 +207,8 @@
       }
     }
 
-    // أول تحميل
     renderDashboard();
 
-    // البحث
     const searchInput = document.getElementById("searchInput");
     const searchType = document.getElementById("searchType");
 
@@ -209,6 +220,7 @@
       renderDashboard(this.value, searchInput.value.trim());
     });
   </script>
+
   <script>
     fetch("sidebar.html")
       .then(res => res.text())
